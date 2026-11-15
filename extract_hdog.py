@@ -42,8 +42,6 @@ def extract_hdog(source):
                     meta.write(decompressed)
 
                     if decoder.eof:
-                        # Everything after the GZIP stream
-                        # belongs to the remaining payload.
                         payload.write(decoder.unused_data)
 
                         while True:
@@ -99,13 +97,11 @@ def extract_hdog(source):
                     try:
                         cursor = start + len(UNITY_MAGIC)
 
-                        # UnityFS format version
                         version = struct.unpack(
                             ">I", data[cursor:cursor + 4]
                         )[0]
                         cursor += 4
-
-                        # Read null-terminated strings
+                        
                         def read_string(pos):
                             end = data.find(b"\x00", pos)
                             if end == -1:
@@ -118,7 +114,6 @@ def extract_hdog(source):
                         player_version, cursor = read_string(cursor)
                         engine_version, cursor = read_string(cursor)
 
-                        # Total bundle size
                         total_size = struct.unpack(
                             ">Q", data[cursor:cursor + 8]
                         )[0]
